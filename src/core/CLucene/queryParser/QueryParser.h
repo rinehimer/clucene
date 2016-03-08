@@ -427,6 +427,8 @@ private:
   */
   TCHAR* discardEscapeChar(TCHAR* input, TCHAR* output=NULL);
 
+  void stripQuotes(QueryToken *term);
+
   /** Returns the numeric value of the hexadecimal character */
   static int32_t hexToInt(TCHAR c);
 

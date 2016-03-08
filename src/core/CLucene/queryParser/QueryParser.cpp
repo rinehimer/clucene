@@ -856,6 +856,15 @@ Query* QueryParser::fClause(TCHAR* _field) {
   return q;
 }
 
+void QueryParser::stripQuotes(QueryToken *term) {
+  if (term->kind == RANGEIN_QUOTED) {
+    int term_slen = _tcslen(term->image);
+    int term_size = term_slen * sizeof(TCHAR) - 2 * sizeof(TCHAR);
+    memmove(term->image, term->image+1, term_size);
+    term->image[term_slen-2] = '\0';
+  }
+}
+
 Query* QueryParser::fTerm(const TCHAR* _field) {
   QueryToken *term, *boost=NULL, *fuzzySlop=NULL, *goop1, *goop2;
   bool prefix = false;
@@ -991,14 +1000,8 @@ Query* QueryParser::fTerm(const TCHAR* _field) {
         jj_la1[15] = jj_gen;
 
 	  // TODO: Allow analysis::Term to accept ownership on a TCHAR* and save on extra dup's
-      if (goop1->kind == RANGEIN_QUOTED) {
-        _tcscpy(goop1->image, goop1->image+1);
-		goop1->image[_tcslen(goop1->image)-1]='\0';
-      }
-      if (goop2->kind == RANGEIN_QUOTED) {
-        _tcscpy(goop2->image, goop2->image+1);
-		goop2->image[_tcslen(goop2->image)-1]='\0';
-      }
+      stripQuotes(goop1);
+      stripQuotes(goop2);
       TCHAR* t1 = discardEscapeChar(goop1->image);
       TCHAR* t2 = discardEscapeChar(goop2->image);
       q = getRangeQuery(_field, t1, t2, true);
