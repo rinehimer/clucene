@@ -52,7 +52,7 @@ void FastCharStream::refill() {
 			buffer = newBuffer;
 		}
 	} else {					  // shift token to front
-		_tcsncpy(buffer, buffer+tokenStart,newPosition);
+		memmove(buffer, buffer + tokenStart, newPosition * sizeof(TCHAR));
 	}
 
 	bufferLength = newPosition;			  // update state
@@ -67,7 +67,7 @@ void FastCharStream::refill() {
 		_CLTHROWA(CL_ERR_IO, "read past eof");
 	}
 	else {
-		memcpy(buffer, charBuf, charsRead * sizeof(TCHAR)); // TODO: Can we use the reader buffer instead of copying to our own?
+		memcpy(buffer + newPosition, charBuf, charsRead * sizeof(TCHAR)); // TODO: Can we use the reader buffer instead of copying to our own?
 		bufferLength += charsRead;
 	}
 }
